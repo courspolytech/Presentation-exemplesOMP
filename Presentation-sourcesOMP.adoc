@@ -1,0 +1,73 @@
+= Exemples OMP
+Patrick Martineau <patrick.martineau@univ-tours.fr>
+v1.0, 2018-03-06
+:sectnums:
+:imagesdir: ./images
+:sourcesdir: ./sources
+
+:toc:
+
+
+== Les bases
+
+=== Vérification de la compilation par votre compilateur, exemple avec gcc
+
+Soit le source suivant hello-simple.c avec une seule ligne pragma OMP simple.
+Vous pouvez compiler classiquement votre code :
+
+[source,sh]
+gcc hello-simple.c -o hello-simple
+
+ou bien en demandant l'interprétation des pragma openMP avec :
+
+[source,sh]
+gcc -fopenmp hello-simple.c -o hello-simple
+
+Lien sur <<{sourcesdir}/hello-simple.c,hello-simple.c>>.
+[source,C]
+include::{sourcesdir}/hello-simple.c[]
+
+=== Tirer partie de l'interprétation ou la non interprétation des clauses openMP
+
+Le même code sert donc à la fois à obtenir un code séquentiel et un code parallèle.
+C'est un outil important qui permet de séparer
+
+. la phase de conception et validation du code séquentiel.
+. de la phase de transformation en code parallèle
+
+
+=== Augmenter la portée de votre code
+
+Pour permettre de recompiler votre source sous Windows/Linux/MacOS, vous pouvez utiliser le fichier omp_repair.h suivant, à la place de <omp.h>
+
+Lien sur <<{sourcesdir}/omp_repair.h,omp_repair.h>>.
+[source,C]
+include::{sourcesdir}/omp_repair.h[]
+
+En conclusion
+
+* [*] Je sais compiler un code OMP
+* [*] Je tire partie de l'accès au code séquentiel pour *vérifier* mes résultats
+* [ ] Je maitrise le degré de parallélisme
+
+== Maitrise du parallélisme
+
+Dans cette partie, on focalise sur la manière de créer des parties pouvant s'exécuter en parallèle et des parties exécutées en un seul exemplaire, en précisant par quel thread.
+
+
+=== Comment paramétrer le nombres des threads en parallèle
+
+Il y a trois manières d'agir sur le degré de parallélisme :
+
+. Au niveau du shell : la compilation au fromat parallèle ayant été réalklisée, on peut utiliser une variable d'environnement pour le préciser
+. Au niveau du processus : au débt du code, on peut préciser le degré de parallélisme à utiliser tout le long de l'exécution de ce programme parallèle
+. Au niveau du block : en utilisant une clause du pragma parallel
+
+=== Comment spécifier ce qui est parallèle de ce qui ne l'est pas
+
+
+== La synchronisation
+
+== La concurrence
+
+== Conclusion
