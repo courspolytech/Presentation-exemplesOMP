@@ -30,9 +30,9 @@ include::{sourcesdir}/hello-simple.c[]
 === Tirer partie de l'interprétation ou la non interprétation des clauses openMP
 
 Le même code sert donc à la fois à obtenir un code séquentiel et un code parallèle.
-C'est un outil important qui permet de séparer
+C'est un outil important qui permet de séparer :
 
-. la phase de conception et validation du code séquentiel.
+. la phase de conception et validation du code séquentiel,
 . de la phase de transformation en code parallèle
 
 
@@ -52,15 +52,16 @@ En conclusion
 
 == Maitrise du parallélisme
 
-Dans cette partie, on focalise sur la manière de créer des parties pouvant s'exécuter en parallèle et des parties exécutées en un seul exemplaire, en précisant par quel thread.
+Dans cette partie, on focalise sur la manière de créer des parties pouvant s'exécuter en parallèle.
+// des parties exécutées en un seul exemplaire, en précisant par quel thread.
 
 
 === Comment paramétrer le nombres des threads en parallèle
 
 Il y a trois manières d'agir sur le degré de parallélisme :
 
-. Au niveau du shell : la compilation au fromat parallèle ayant été réalklisée, on peut utiliser une variable d'environnement pour le préciser
-. Au niveau du processus : au débt du code, on peut préciser le degré de parallélisme à utiliser tout le long de l'exécution de ce programme parallèle
+. Au niveau du shell : la compilation au format parallèle ayant été réalisée, on peut utiliser une variable d'environnement pour le préciser
+. Au niveau du processus : au début du code, on peut préciser le degré de parallélisme à utiliser tout le long de l'exécution de ce programme parallèle
 . Au niveau du block : en utilisant une clause du pragma parallel
 
 === Comment spécifier ce qui est parallèle de ce qui ne l'est pas
@@ -71,3 +72,23 @@ Il y a trois manières d'agir sur le degré de parallélisme :
 == La concurrence
 
 == Conclusion
+
+atomic.c
+barrier.c
+critical.c
+firstprivate.c
+hello.c
+lastprivate.c
+ordered.c
+ordered2.c
+parallelfor+.c
+parallelfor.c
+pi.c
+private.c
+reduction+.c
+reduction.c
+schedule.c
+sections.c
+sections2.c
+shared.c
+single.c
