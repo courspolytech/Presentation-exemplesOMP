@@ -55,40 +55,140 @@ En conclusion
 Dans cette partie, on focalise sur la manière de créer des parties pouvant s'exécuter en parallèle.
 // des parties exécutées en un seul exemplaire, en précisant par quel thread.
 
+=== Comment spécifier ce qui est parallèle de ce qui ne l'est pas
+
+Le premier exemple a pour but de démarrer plusieurs threads en parallèle et de montrer que chacun a une identité propre, puisque chacun affiche un numéro différent.
+Chacun a donc une variable privée *iam* qui contient une valeur différente.
+[red]#*(Et ce n'est pas bien !)*#
+
+Lien sur <<{sourcesdir}/hello.c,hello.c>>.
+[source,C]
+include::{sourcesdir}/hello.c[]
+
+Dans cet exemple, on peut s'étonner de demander à chaque thread de remplir la variable *np* avec le nombre de threads.
+Tous les threads obtiennent la même valeur.
+On aurait pu utiliser une variable partagée et demander à un seul thread de l'affecter avec le nombre de threads. Malheuresement cela nous obligerait à synchroniser tous les threads.
+
+
+L'exemple suivant introduit une variable *b* partagée par plusieurs threads.
+Cette variable est donc lue et modifiée simultanément, ou quasi-simultanément, par plusieurs threads.
+Ce programme peut donc conduire à un résultat incohérent.
+
+Lien sur <<{sourcesdir}/shared.c,shared.c>>.
+[source,C]
+include::{sourcesdir}/shared.c[]
+
+
+Parfois, à l'intérieur d'une section parallèle, il y a une partie qui doit être exécutée une seule fois (par exemple, affecter *np* dans l'exemple <<{sourcesdir}/hello.c,hello.c>>).
+
+Lien sur <<{sourcesdir}/single.c,single.c>>.
+[source,C]
+include::{sourcesdir}/single.c[]
+
+Remarquons que ce pragma ne permet pas de préciser quel thread réalisera le block de code en question.
+On peut considérer que c'est le premier thread qui arrivera sur cette section qui l'exécutera et que les suivants passeront directement aux instructions qui suivent ce block.
+De toute manière, tous les threads attendent que celui qui exécute la section ait fini.
+
+L'exemple suivant permet de rapidement créer tous les threads en parallèle mais de définir séparément ce que chaque thread doit faire de sont coté.
+
+Lien sur <<{sourcesdir}/sections.c,sections.c>>.
+[source,C]
+include::{sourcesdir}/sections.c[]
+
+En conclusion
+
+* [*] Je sais créer des threads en parallèle
+* [*] Je sais séparer code parallèle et code à éxécuter par un seul thread
+* [*] Je maitrise le degré de parallélisme
+* [ ] Je maitrise le partage des données
 
 === Comment paramétrer le nombres des threads en parallèle
 
 Il y a trois manières d'agir sur le degré de parallélisme :
 
 . Au niveau du shell : la compilation au format parallèle ayant été réalisée, on peut utiliser une variable d'environnement pour le préciser
+[source,sh]
+export OMP_NUM_THREADS=8
+
 . Au niveau du processus : au début du code, on peut préciser le degré de parallélisme à utiliser tout le long de l'exécution de ce programme parallèle
-. Au niveau du block : en utilisant une clause du pragma parallel
+[source,C]
+omp_set_num_threads(NumThreads);
 
-=== Comment spécifier ce qui est parallèle de ce qui ne l'est pas
-
+. Au niveau du block : en utilisant une clause du pragma parallel qui permet de préciser le degré de parallélisme pour la section parallèle
+[source,C]
+num_threads(NumTreads)
 
 == La synchronisation
 
+Le pragma barrier permet de préciser un point de synchronisation commun à tous les threads au milieu d'une section parallèle.
+Tous les threads seront bloqués à ce point du code tant que tous les threads ne sont pas arrivés à ce point.
+Un équivalent serait de séparer cette section parallèle en deux sections successives mais on perdrait l'état et la valeur des données locales.
+
+Lien sur <<{sourcesdir}/barrier.c,barrier.c>>.
+[source,C]
+include::{sourcesdir}/barrier.c[]
+
+
+
 == La concurrence
+
+A partir du moment où plusieurs threads s'exécutent simultanément, le problème est de décider si chaque thread a accès à sa version d'une variable (variable privée) ou si la variable est partagée et tous les threads accèdent à la même case mémoire.
+Dans l'exemple suivant, la clause private permet de préciser les variables privées.
+En C, par défaut la variable est partagée mais je vous conseille de le préciser avec *shared()*.
+
+Lien sur <<{sourcesdir}/private.c,private.c>>.
+[source,C]
+include::{sourcesdir}/private.c[]
+
+Dans cet exemple, on remarque que chaque thread n'a pas une initialisation de *b* à 20.
+Chaque thread ajoute 1 à 'sa variable *b*'.
+Une fois tous les threads achevés, la variable *b* affichée est toujours égale à 20.
+
+Pour préciser la valeur initiale d'une variable privée, on peut affecter celle-ci au début du thread ou utiliser *firstprivate()* pour 'recopier' la valeur présente avant le début de la section parallèle.
+
+Lien sur <<{sourcesdir}/firstprivate.c,firstprivate.c>>.
+[source,C]
+include::{sourcesdir}/firstprivate.c[]
+
+L'exemple suivant permet d'indiquer quelle valeur sera recopiée dans la variable, une fois les threads parallèles achevés.
+
+Lien sur <<{sourcesdir}/lastprivate.c,lastprivate.c>>.
+[source,C]
+include::{sourcesdir}/lastprivate.c[]
+
+
+Dans le cas des variables partagées, on peut rapidement mettre en évidence un problème de cohérence.
+Pour celà, il suffit de préciser un nombre de threads important, par exemple 1000, avant l'exécution du programme suivant.
+
+Lien sur <<{sourcesdir}/shared.c,shared.c>>.
+[source,C]
+include::{sourcesdir}/shared.c[]
+
+Le problème mis en évidence avec ce résultat incohérent est qu'une variable partagée (ici *b*) doit doit être protégée si on veut que plusieurs threads la modifient.
+
+On a besoin de garantir l'exclusion mutuelle entre plusieurs threads pour réaliser ces modifications.
+Deux solutions sont proposées en fonction de la granularité de la section critique (le nombre et la complexité des opérations).
+Pour une opération simple :
+
+Lien sur <<{sourcesdir}/atomic.c,atomic.c>>.
+[source,C]
+include::{sourcesdir}/atomic.c[]
+
+Pour un block d'instructions plus complexe :
+
+Lien sur <<{sourcesdir}/critical.c,critical.c>>.
+[source,C]
+include::{sourcesdir}/critical.c[]
+
 
 == Conclusion
 
-atomic.c
-barrier.c
-critical.c
-firstprivate.c
-hello.c
-lastprivate.c
-ordered.c
-ordered2.c
-parallelfor+.c
-parallelfor.c
-pi.c
-private.c
-reduction+.c
-reduction.c
-schedule.c
-sections.c
-sections2.c
-shared.c
-single.c
+Il reste à étudier les exemples suivants :
+
+* ordered.c
+* ordered2.c
+* parallelfor+.c
+* parallelfor.c
+* reduction+.c
+* reduction.c
+* schedule.c
