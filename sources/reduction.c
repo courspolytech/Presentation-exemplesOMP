@@ -9,7 +9,6 @@ int main() {
     a[i] = i;
     b[i] = 2 * i;
   }
-
 #pragma omp parallel shared(a, b), private(i), reduction(+:result)
   {
 #pragma omp for
