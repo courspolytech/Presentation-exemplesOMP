@@ -54,7 +54,7 @@ En conclusion
 Dans cette partie, on focalise sur la manière de créer des parties pouvant s'exécuter en parallèle.
 // des parties exécutées en un seul exemplaire, en précisant par quel thread.
 
-=== Comment spécifier ce qui est parallèle de ce qui ne l'est pas
+=== Comment spécifier ce qui est parallèle de ce qui ne l'est pas ?
 
 Le premier exemple a pour but de démarrer plusieurs threads en parallèle et de montrer que chacun a une identité propre, puisque chacun affiche un numéro (identifiant) différent.
 Chacun a donc une variable privée *iam* qui contient une valeur différente.
@@ -67,6 +67,8 @@ include::{sourcesdir}/hello.c[]
 Dans cet exemple, on peut s'étonner de demander à chaque thread de remplir la variable *np* avec le nombre de threads.
 Tous les threads obtiennent la même valeur.
 On aurait pu utiliser une variable partagée et demander à un seul thread de l'affecter avec le nombre de threads. Malheureusement, cela nous obligerait à synchroniser tous les threads, et donc on perdrait du temps...
+
+Avec l'ajout d'une seule ligne, cet exemple a permis de créer plusieurs threads. Chacun exécute le code entre accolades. Les variables *iam* et *np* sont privées, c'est-à-dire que chaque thread a sa version de ces variables.
 
 
 L'exemple suivant introduit une variable *b* partagée par plusieurs threads.
@@ -104,27 +106,27 @@ include::{sourcesdir}/sections.c[]
 
 Il y a trois manières d'agir sur le degré de parallélisme :
 
-. Au niveau du shell : la compilation au format parallèle ayant été réalisée, on peut utiliser une variable d'environnement pour le préciser
+. Au niveau du shell : la compilation au format parallèle ayant été réalisée, on peut utiliser une variable d'environnement pour préciser le nombre de threads à créer dans *les processus fils* :
 [source,sh]
 export OMP_NUM_THREADS=8
 
-. Au niveau du processus : au début du code, on peut préciser le degré de parallélisme à utiliser tout le long de l'exécution de ce programme parallèle
+. Au niveau du processus : au début du code, on peut préciser le degré de parallélisme à utiliser tout le long de l'exécution de ce *processus* :
 [source,C]
 omp_set_num_threads(NumThreads);
 
-. Au niveau du block : en utilisant une clause du pragma parallel qui permet de préciser le degré de parallélisme pour la section parallèle
+. Au niveau du block : en utilisant une clause du pragma parallel qui permet de préciser le degré de parallélisme pour la *section* parallèle
 [source,C]
-num_threads(NumTreads)
+#pragma omp parallel num_threads(NumTreads)
 
 En conclusion
 
-* [*] Je maîtrise le degré de parallélisme
+* [*] Je contrôle le degré de parallélisme
 
 == La synchronisation
 
 Le pragma barrier permet de préciser un point de synchronisation commun à tous les threads au milieu d'une section parallèle.
 Tous les threads seront bloqués à ce point du code tant que tous les threads ne sont pas arrivés à ce point.
-Un équivalent serait de séparer cette section parallèle en deux sections successives mais on perdrait l'état et la valeur des données locales.
+Un équivalent serait de séparer cette section parallèle en deux sections parallèles successives mais on perdrait les valeurs des données locales.
 
 Lien sur <<{sourcesdir}/barrier.c,barrier.c>>.
 [source,C]
@@ -166,7 +168,7 @@ Lien sur <<{sourcesdir}/shared.c,shared.c>>.
 [source,C]
 include::{sourcesdir}/shared.c[]
 
-Le problème mis en évidence avec ce résultat incohérent est qu'une variable partagée (ici *b*) doit doit être protégée si on veut que plusieurs threads la modifient.
+Le problème mis en évidence avec ce résultat incohérent est qu'une variable partagée (ici *b*) doit être protégée si on veut que plusieurs threads la modifient.
 
 On a besoin de garantir l'exclusion mutuelle entre plusieurs threads pour réaliser ces modifications.
 Deux solutions sont proposées en fonction de la granularité de la section critique (le nombre et la complexité des opérations).
