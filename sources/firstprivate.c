@@ -1,5 +1,5 @@
-#include <omp.h>
 #include <stdio.h>
+#include "omp_repair.h"
 int main() {
   int b = 20, tid = 0;
 #pragma omp parallel private(tid) firstprivate(b)

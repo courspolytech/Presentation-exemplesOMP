@@ -1,4 +1,5 @@
-#include<stdio.h>
+#include <stdio.h>
+#include "omp_repair.h"
 int main(int argc, char *argv[]) {
 printf("Mon programme commence !\n");
 #pragma omp parallel sections

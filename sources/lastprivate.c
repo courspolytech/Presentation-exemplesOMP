@@ -1,5 +1,5 @@
-#include <omp.h>
 #include <stdio.h>
+#include "omp_repair.h"
 #define SIZE 20
 int main() {
   int i,a, n=SIZE;

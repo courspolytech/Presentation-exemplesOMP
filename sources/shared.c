@@ -1,5 +1,5 @@
-#include <omp.h>
 #include <stdio.h>
+#include "omp_repair.h"
 int main(int argc, char *argv[]) {
   int b = 0;
 #pragma omp parallel shared(b)

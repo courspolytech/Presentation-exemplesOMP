@@ -1,7 +1,7 @@
-#include <omp.h>
 #include <stdio.h>
+#include "omp_repair.h"
 #define SIZE 20
-int main() {        
+int main() {
   int a[SIZE], b[SIZE], c[SIZE], i, tid;
   for(i = 0; i < SIZE; i++) {
     a[i] = i;

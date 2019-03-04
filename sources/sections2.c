@@ -1,4 +1,5 @@
-#include<stdio.h>
+#include <stdio.h>
+#include "omp_repair.h"
 int main(int argc, char *argv[]) {
 
 printf("Mon programme commence !\n");
@@ -16,6 +17,6 @@ printf("Mon programme commence !\n");
 	}
 
 /*printf("Mon dernier thread %d sur %d.\n",omp_get_thread_num(), omp_get_num_threads());*/
-} 
+}
 
 }

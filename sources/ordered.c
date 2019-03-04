@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "omp_repair.h"
 void work(int k)
 {
   #pragma omp ordered

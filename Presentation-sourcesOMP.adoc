@@ -7,7 +7,6 @@ v1.0, 2018-03-06
 
 :toc:
 
-
 == Les bases
 
 === Vérification de la compilation par votre compilateur, exemple avec gcc
@@ -33,7 +32,7 @@ Le même code sert donc à la fois à obtenir un code séquentiel et un code par
 C'est un outil important qui permet de séparer :
 
 . la phase de conception et validation du code séquentiel,
-. de la phase de transformation en code parallèle
+. de la phase de transformation en code parallèle (donc vous conservez en permanence la capacité à vérifier que vos modifications n’entraînent pas d'erreur à l'exécution)
 
 
 === Augmenter la portée de votre code
@@ -57,9 +56,9 @@ Dans cette partie, on focalise sur la manière de créer des parties pouvant s'e
 
 === Comment spécifier ce qui est parallèle de ce qui ne l'est pas
 
-Le premier exemple a pour but de démarrer plusieurs threads en parallèle et de montrer que chacun a une identité propre, puisque chacun affiche un numéro différent.
+Le premier exemple a pour but de démarrer plusieurs threads en parallèle et de montrer que chacun a une identité propre, puisque chacun affiche un numéro (identifiant) différent.
 Chacun a donc une variable privée *iam* qui contient une valeur différente.
-[red]#*(Et ce n'est pas bien !)*#
+//[red]#*(Et ce n'est pas bien !)*#
 
 Lien sur <<{sourcesdir}/hello.c,hello.c>>.
 [source,C]
@@ -67,7 +66,7 @@ include::{sourcesdir}/hello.c[]
 
 Dans cet exemple, on peut s'étonner de demander à chaque thread de remplir la variable *np* avec le nombre de threads.
 Tous les threads obtiennent la même valeur.
-On aurait pu utiliser une variable partagée et demander à un seul thread de l'affecter avec le nombre de threads. Malheuresement cela nous obligerait à synchroniser tous les threads.
+On aurait pu utiliser une variable partagée et demander à un seul thread de l'affecter avec le nombre de threads. Malheureusement, cela nous obligerait à synchroniser tous les threads, et donc on perdrait du temps...
 
 
 L'exemple suivant introduit une variable *b* partagée par plusieurs threads.
@@ -87,20 +86,19 @@ include::{sourcesdir}/single.c[]
 
 Remarquons que ce pragma ne permet pas de préciser quel thread réalisera le block de code en question.
 On peut considérer que c'est le premier thread qui arrivera sur cette section qui l'exécutera et que les suivants passeront directement aux instructions qui suivent ce block.
-De toute manière, tous les threads attendent que celui qui exécute la section ait fini.
+De toute manière, tous les threads attendent que celui qui exécute la section ait fini avant de démarrer le code qui suit cette section "single".
 
 L'exemple suivant permet de rapidement créer tous les threads en parallèle mais de définir séparément ce que chaque thread doit faire de son coté.
+S'il y a moins de section que de threads créés, alors certains threads se finissent immédiatement car ils n'ont rien à faire.
 
 Lien sur <<{sourcesdir}/sections.c,sections.c>>.
 [source,C]
 include::{sourcesdir}/sections.c[]
 
-En conclusion
 
 * [*] Je sais créer des threads en parallèle
-* [*] Je sais séparer code parallèle et code à éxécuter par un seul thread
-* [*] Je maitrise le degré de parallélisme
-* [ ] Je maitrise le partage des données
+* [*] Je sais séparer code parallèle et code à exécuter par un seul thread
+* [ ] Je maîtrise le partage des données
 
 === Comment paramétrer le nombres des threads en parallèle
 
@@ -117,6 +115,10 @@ omp_set_num_threads(NumThreads);
 . Au niveau du block : en utilisant une clause du pragma parallel qui permet de préciser le degré de parallélisme pour la section parallèle
 [source,C]
 num_threads(NumTreads)
+
+En conclusion
+
+* [*] Je maîtrise le degré de parallélisme
 
 == La synchronisation
 
@@ -183,12 +185,21 @@ include::{sourcesdir}/critical.c[]
 
 == Conclusion
 
-Il reste à étudier les exemples suivants :
+Il reste à étudier les exemples suivants.
+
+Pour "déplier" une boucle *for* simplement :
+
+* parallelfor.c
+* parallelfor+.c
+* schedule.c
+
+
+Pour consolider un résultat global sur la base de résultats partiels obtenus par les différents threads :
+
+* reduction+.c
+* reduction.c
+
+Pour conserver un ordre correspondant à l'ordre séquentiel d'une boucle sur une partie de la section:
 
 * ordered.c
 * ordered2.c
-* parallelfor+.c
-* parallelfor.c
-* reduction+.c
-* reduction.c
-* schedule.c
